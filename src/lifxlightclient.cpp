@@ -14,6 +14,7 @@ LIFXLightClient::LIFXLightClient(LIFXPacket *packet) :
 {
     type |= QTIoTTypePowerSwitch + QTIoTTypeLightBulb + QTIoTTypeTimer;
     setAddress((new QByteArray(packet->header.target_mac_address, 6))->toHex());
+    memcpy(m_addressraw, packet->header.target_mac_address, sizeof(packet->header.target_mac_address));
 
     LIFXLightStatusPayload *payload = (LIFXLightStatusPayload*)packet->payloaddata;
     setPower_NoUpdate(payload->power);
@@ -26,7 +27,6 @@ LIFXLightClient::LIFXLightClient(LIFXPacket *packet) :
 }
 bool LIFXLightClient::setState(LIFXPacket *packet)
 {
-
     QString address = (new QByteArray(packet->header.target_mac_address, 6))->toHex();
 
     if(address == getAddress())
@@ -50,6 +50,7 @@ bool LIFXLightClient::setState(LIFXPacket *packet)
 QString LIFXLightClient::setLabel(QString newLabel)
 {
     LIFXPacket *packet = new LIFXPacket(LIFX_SET_BULB_LABEL);
+    memcpy(packet->header.target_mac_address, m_addressraw, sizeof(packet->header.target_mac_address));
     LIFXSetBulbLabelPayload *payload = (LIFXSetBulbLabelPayload*)packet->payloaddata;
     if(payload != NULL)
     {
@@ -66,6 +67,7 @@ QString LIFXLightClient::setLabel(QString newLabel)
 bool LIFXLightClient::setPower(bool state)
 {
     LIFXPacket *packet = new LIFXPacket(LIFX_SET_POWER_STATE);
+    memcpy(packet->header.target_mac_address, m_addressraw, sizeof(packet->header.target_mac_address));
     LIFXSetPowerStatePayload *payload = (LIFXSetPowerStatePayload*)packet->payloaddata;
     if(payload != NULL)
     {
@@ -92,6 +94,7 @@ void LIFXLightClient::setColour(QColor color)
 void LIFXLightClient::setBrightness(float brightnesspercent)
 {
     LIFXPacket *packet = new LIFXPacket(LIFX_SET_DIM_ABSOLUTE);
+    memcpy(packet->header.target_mac_address, m_addressraw, sizeof(packet->header.target_mac_address));
     LIFXSetDimAbsStatePayload *payload = (LIFXSetDimAbsStatePayload*)packet->payloaddata;
     if(payload != NULL)
     {
@@ -115,6 +118,7 @@ void LIFXLightClient::setColourAll(int red, int green, int blue, float brightnes
 void LIFXLightClient::setDimming(float dimpercent)
 {
     LIFXPacket *packet = new LIFXPacket(LIFX_SET_DIM_RELATIVE);
+    memcpy(packet->header.target_mac_address, m_addressraw, sizeof(packet->header.target_mac_address));
     LIFXSetDimRelStatePayload *payload = (LIFXSetDimRelStatePayload*)packet->payloaddata;
     if(payload != NULL)
     {
@@ -128,6 +132,7 @@ void LIFXLightClient::setDimming(float dimpercent)
 bool LIFXLightClient::sendColour()
 {
     LIFXPacket *packet = new LIFXPacket(LIFX_SET_LIGHT_COLOR);
+    memcpy(packet->header.target_mac_address, m_addressraw, sizeof(packet->header.target_mac_address));
     LIFXSetLightColorPayload *payload = (LIFXSetLightColorPayload*)packet->payloaddata;
     if(payload != NULL)
     {
@@ -165,6 +170,7 @@ long LIFXLightClient::setTime(QDateTime newTime)
 bool LIFXLightClient::sendTime()
 {
     LIFXPacket *packet = new LIFXPacket(LIFX_SET_TIME);
+    memcpy(packet->header.target_mac_address, m_addressraw, sizeof(packet->header.target_mac_address));
     LIFXSetTimeStatePayload *payload = (LIFXSetTimeStatePayload*)packet->payloaddata;
     if(payload != NULL)
     {
@@ -175,6 +181,9 @@ bool LIFXLightClient::sendTime()
 
     return false;
 }
+
+
+/** Util **/
 
 } // namespace LIFX
 } // namespace QTIoT

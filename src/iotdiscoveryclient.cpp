@@ -28,5 +28,17 @@ bool IoTDiscoveryClient::addIoTItem(QString address, QTIoT::IoTObject *item)
     return false;
 }
 
+void IoTDiscoveryClient::IoTItemDiscovered(IoTObject * item)
+{
+    addIoTItem(item->getAddress(), item);  // <-- MUST figure out proper address
+
+/*    if(!items.contains(address))
+    {
+        items.insert(address, item);
+        emit newIoTItem(item);
+        return true;
+    }
+    return false;*/
+}
 
 } // namespace QTIoT

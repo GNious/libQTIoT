@@ -26,13 +26,16 @@ class LIFXLightClient : public QTIoT::IoTObject,
     Q_PROPERTY(QDateTime time READ getTimeQDateTime WRITE setTime NOTIFY timeChanged)
 //    Q_PROPERTY(QString label READ getLabel WRITE setLabel NOTIFY labelChanged)
 
+
 private:
     float fadetime;
     QString label;
     int64_t    time; //since Epoc Jan 1st, 1970
+    char m_addressraw[6];
 
     bool sendColour();
     bool sendTime();
+
 
 public:
     explicit LIFXLightClient(QObject *parent = 0);

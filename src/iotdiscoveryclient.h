@@ -42,6 +42,9 @@ signals:
 
 public slots:
 
+protected slots:
+    void IoTItemDiscovered(IoTObject * item);
+
 };
 
 } // namespace QTIoT
