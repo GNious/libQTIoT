@@ -23,9 +23,11 @@ private:
 
 private slots:
     void readPendingDatagrams();
+    //void timingDiscovery();
 
 public:
-    LIFXDiscoveryClient();
+	LIFXDiscoveryClient();
+	~LIFXDiscoveryClient();
 
     QUdpSocket *udpSocket;// = NULL;
 
@@ -33,6 +35,8 @@ public:
     bool sendMessage(IoTObject *obj, void *msg);
 //    bool sendMessage(LIFXPacket *packet);
     Q_INVOKABLE bool discover();
+    //Q_INVOKABLE bool startDiscoveryTimer(int waitMs = 10000);
+    //Q_INVOKABLE bool endDiscoveryTimer();
 
 signals:
     void newGatewayClient(LIFXGatewayClient *client);

@@ -10,7 +10,7 @@ enum QTIoTTypes
     QTIoTTypePowerSwitch = 1 << 0,
     QTIoTTypeLightBulb = 1 << 1,
     QTIoTTypeTimer = 1 << 8,
-    QTIoTTypeMax = 1 << 64,
+	QTIoTTypeMax = 1 << 64
 };
 
 #endif // QTIOTCONSTANTS_H

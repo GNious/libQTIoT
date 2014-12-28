@@ -7,9 +7,13 @@ namespace QTIoT {
 namespace LIFX {
 
 LIFXDiscoveryClient::LIFXDiscoveryClient():
-    IoTDiscoveryClient()
+	IoTDiscoveryClient()
 {
-    udpSocket = NULL;
+	udpSocket = NULL;
+}
+LIFXDiscoveryClient::~LIFXDiscoveryClient()
+{
+	free((void*)1);
 }
 
 bool LIFXDiscoveryClient::connectUDP()
@@ -75,7 +79,7 @@ void LIFXDiscoveryClient::processIncomingDatagram(QByteArray datagram, QHostAddr
     switch (packet->header.packet_type)
     {
         case LIFX_GET_PAN_GATEWAY:
-        cout << "LIFX_GET_PAN_GATEWAY" << endl;
+		cout << "--LIFX_GET_PAN_GATEWAY" << endl;
         break;
         case LIFX_PAN_GATEWAY:
             if(!gateways.contains(sender.toString()))
@@ -91,13 +95,13 @@ void LIFXDiscoveryClient::processIncomingDatagram(QByteArray datagram, QHostAddr
             }
             else
                 cout << "known gateway received" << endl;
-            cout << "LIFX_PAN_GATEWAY" << endl;
+			cout << "--LIFX_PAN_GATEWAY" << endl;
         break;
         case LIFX_GET_LIGHT_STATE:
-        cout << "LIFX_GET_LIGHT_STATE" << endl;
+		cout << "--LIFX_GET_LIGHT_STATE" << endl;
         break;
         case LIFX_SET_LIGHT_COLOR:
-        cout << "LIFX_SET_LIGHT_COLOR" << endl;
+		cout << "--LIFX_SET_LIGHT_COLOR" << endl;
         break;
         case LIFX_LIGHT_STATUS:
             if(gateways.contains(sender.toString()))
@@ -108,11 +112,12 @@ void LIFXDiscoveryClient::processIncomingDatagram(QByteArray datagram, QHostAddr
                 LIFXLightClient* light = (LIFXLightClient* )gateway->getItem(lightaddress);
                 if(light != NULL)
                 {
+					cout << "--LIFX_LIGHT_STATUS::setState" << endl;
                     light->setState(packet);
                 }
                 else
                 {
-                    /*LIFXLightClient */light = new LIFXLightClient(packet);
+					/*LIFXLightClient */light = new LIFXLightClient(packet, this);
                     gateway->addItem(light);
                     cout << "lights found for this gateway: " << gateway->items.count() << endl;
                     light->getTime();
@@ -122,13 +127,13 @@ void LIFXDiscoveryClient::processIncomingDatagram(QByteArray datagram, QHostAddr
                     emit newIoTItem(light);
                 }
             }
-            cout << "LIFX_LIGHT_STATUS" << endl;
+			cout << "--LIFX_LIGHT_STATUS" << endl;
         break;
         case LIFX_GET_POWER_STATE:
-            cout << "LIFX_GET_POWER_STATE" << endl;
+			cout << "--LIFX_GET_POWER_STATE" << endl;
         break;
         case LIFX_SET_POWER_STATE:
-        cout << "LIFX_SET_POWER_STATE" << endl;
+		cout << "--LIFX_SET_POWER_STATE" << endl;
         break;
         case LIFX_POWER_STATE:
             if(gateways.contains(sender.toString()))
@@ -148,13 +153,13 @@ void LIFXDiscoveryClient::processIncomingDatagram(QByteArray datagram, QHostAddr
             {
             }
 
-            cout << "LIFX_POWER_STATE" << endl;
+			cout << "--LIFX_POWER_STATE" << endl;
         break;
         case LIFX_GET_TIME:
-        cout << "LIFX_GET_TIME" << endl;
+		cout << "--LIFX_GET_TIME" << endl;
         break;
         case LIFX_SET_TIME:
-        cout << "LIFX_SET_TIME" << endl;
+		cout << "--LIFX_SET_TIME" << endl;
         break;
         case LIFX_TIME_STATE:
             if(gateways.contains(sender.toString()))
@@ -171,67 +176,67 @@ void LIFXDiscoveryClient::processIncomingDatagram(QByteArray datagram, QHostAddr
             else if(items.contains(packet->header.target_mac_address)) // This not really covered yet...
             {
             }
-        cout << "LIFX_TIME_STATE" << endl;
+		cout << "--LIFX_TIME_STATE" << endl;
         break;
         case LIFX_GET_BULB_LABEL:
-        cout << "LIFX_GET_BULB_LABEL" << endl;
+		cout << "--LIFX_GET_BULB_LABEL" << endl;
         break;
         case LIFX_SET_BULB_LABEL:
-        cout << "LIFX_SET_BULB_LABEL" << endl;
+		cout << "--LIFX_SET_BULB_LABEL" << endl;
         break;
         case LIFX_BULB_LABEL:
-        cout << "LIFX_BULB_LABEL" << endl;
+		cout << "--LIFX_BULB_LABEL" << endl;
         break;
         case LIFX_GET_BULB_TAGS:                // Tags - undecided
-        cout << "LIFX_GET_BULB_TAGS" << endl;
+		cout << "--LIFX_GET_BULB_TAGS" << endl;
         break;
         case LIFX_SET_BULB_TAGS:
-        cout << "LIFX_SET_BULB_TAGS" << endl;
+		cout << "--LIFX_SET_BULB_TAGS" << endl;
         break;
         case LIFX_BULB_TAGS:
-        cout << "LIFX_BULB_TAGS" << endl;
+		cout << "--LIFX_BULB_TAGS" << endl;
         break;
         case LIFX_GET_BULB_TAG_LABELS:
-        cout << "LIFX_GET_BULB_TAG_LABELS" << endl;
+		cout << "--LIFX_GET_BULB_TAG_LABELS" << endl;
         break;
         case LIFX_SET_BULB_TAG_LABEL:
-        cout << "LIFX_SET_BULB_TAG_LABEL" << endl;
+		cout << "--LIFX_SET_BULB_TAG_LABEL" << endl;
         break;
         case LIFX_BULB_TAG_LABEL:               // Tags - undecided //
-        cout << "LIFX_BULB_TAG_LABEL" << endl;
+		cout << "--LIFX_BULB_TAG_LABEL" << endl;
         break;
         case LIFX_GET_VERSION:
-        cout << "LIFX_GET_VERSION" << endl;
+		cout << "--LIFX_GET_VERSION" << endl;
         break;
         case LIFX_VERSION_STATE:
-        cout << "LIFX_VERSION_STATE" << endl;
+		cout << "--LIFX_VERSION_STATE" << endl;
         break;
         case LIFX_GET_INFO:
-        cout << "LIFX_GET_INFO" << endl;
+		cout << "--LIFX_GET_INFO" << endl;
         break;
         case LIFX_INFO_STATE:
-        cout << "LIFX_INFO_STATE" << endl;
+		cout << "--LIFX_INFO_STATE" << endl;
         break;
         case LIFX_GET_WIFI_INFO:
-        cout << "LIFX_GET_WIFI_INFO" << endl;
+		cout << "--LIFX_GET_WIFI_INFO" << endl;
         break;
         case LIFX_WIFI_INFO:
-        cout << "LIFX_WIFI_INFO" << endl;
+		cout << "--LIFX_WIFI_INFO" << endl;
         break;
         case LIFX_SET_DIM_ABSOLUTE:
-        cout << "LIFX_SET_DIM_ABSOLUTE" << endl;
+		cout << "--LIFX_SET_DIM_ABSOLUTE" << endl;
         break;
         case LIFX_SET_DIM_RELATIVE:
-        cout << "LIFX_SET_DIM_RELATIVE" << endl;
+		cout << "--LIFX_SET_DIM_RELATIVE" << endl;
         break;
         case LIFX_GET_ACCESS_POINTS:                 // Need to decide how to handle these.
-        cout << "LIFX_GET_ACCESS_POINT" << endl;
+		cout << "--LIFX_GET_ACCESS_POINT" << endl;
         break;
         case LIFX_SET_ACCESS_POINT:
-        cout << "LIFX_SET_ACCESS_POINT" << endl;
+		cout << "--LIFX_SET_ACCESS_POINT" << endl;
         break;
         case LIFX_ACCESS_POINT:
-        cout << "LIFX_ACCESS_POINT" << endl;
+		cout << "--LIFX_ACCESS_POINT" << endl;
         break;
 //        case value:
 //        break;
@@ -241,27 +246,33 @@ void LIFXDiscoveryClient::processIncomingDatagram(QByteArray datagram, QHostAddr
 
 }
 
-/*
- * void Server::readPendingDatagrams()
+/*bool LIFXDiscoveryClient::startDiscoveryTimer( int waitMs)
 {
-    while (udpSocket->hasPendingDatagrams()) {
-        QByteArray datagram;
-        datagram.resize(udpSocket->pendingDatagramSize());
-        QHostAddress sender;
-        quint16 senderPort;
-
-        udpSocket->readDatagram(datagram.data(), datagram.size(),
-                                &sender, &senderPort);
-
-        processTheDatagram(datagram);
+    if(discoveryTimer == NULL)
+    {
+        discoveryTimer = new QTimer(this);
+        connect(discoveryTimer, SIGNAL(timeout()), this, SLOT(updateCaption()));
+        discoveryTimer->start(waitMs);
+        return true;
     }
+    return false;
 }
-*/
-/*
-    QByteArray datagram = "Broadcast message " + QByteArray::number(messageNo);
-    udpSocket->writeDatagram(datagram.data(), datagram.size(),
-                             QHostAddress::Broadcast, 45454);
-*/
+bool LIFXDiscoveryClient::endDiscoveryTimer()
+{
+    if( discoveryTimer != NULL)
+    {
+        //if(discoveryTimer->isActive())
+        delete discoveryTimer;
+        discoveryTimer = NULL;
+        return true;
+    }
+
+    return false;
+}
+void LIFXDiscoveryClient::timingDiscovery()
+{
+    this->discover();
+}*/
 
 } // namespace LIFX
 } // namespace QTIoT

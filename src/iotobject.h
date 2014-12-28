@@ -29,6 +29,7 @@ protected:
 
 public:
     explicit IoTObject(QObject *parent = 0);
+	~IoTObject();
 
     QString getAddress(){ return address;};
     QString setAddress(QString newAddress){ address = newAddress; return address;};

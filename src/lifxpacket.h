@@ -13,16 +13,16 @@ namespace LIFX {
 typedef struct LIFXHeader
 {
     //Adapted from https://github.com/magicmonkey/lifxjs/blob/master/Protocol.md
-    uint16_t    size;           // LE
-    uint16_t    protocol;
-    uint32_t    reserved1;      // Always 0x0000
+	quint16    size;           // LE
+	quint16    protocol;
+	quint32    reserved1;      // Always 0x0000
     char        target_mac_address[6];
-    uint16_t    reserved2;      // Always 0x00
+	quint16    reserved2;      // Always 0x00
     char        site[6];        // MAC address of gateway PAN controller bulb
-    uint16_t    reserved3;      // Always 0x00
-    uint64_t    timestamp;
-    uint16_t    packet_type;    // LE
-    uint16_t    reserved4;
+	quint16    reserved3;      // Always 0x00
+	quint64    timestamp;
+	quint16    packet_type;    // LE
+	quint16    reserved4;
 } LIFXHeader;
 #pragma pack(pop)
 

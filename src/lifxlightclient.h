@@ -21,10 +21,11 @@ class LIFXLightClient : public QTIoT::IoTObject,
     Q_PROPERTY(QString label READ getLabel WRITE setLabel )
     Q_PROPERTY(QColor colour READ getColour WRITE setColour NOTIFY bulbColorsChanged )
     Q_PROPERTY(qint16 temperature READ getTemperature WRITE setTemperature )
-    Q_PROPERTY(float brightness READ getBrightness WRITE setDimming )
+	Q_PROPERTY(float brightness READ getBrightness WRITE setBrightness /*setDimming*/ )
     Q_PROPERTY(bool power READ getPower WRITE setPower NOTIFY powerChanged)
     Q_PROPERTY(QDateTime time READ getTimeQDateTime WRITE setTime NOTIFY timeChanged)
 //    Q_PROPERTY(QString label READ getLabel WRITE setLabel NOTIFY labelChanged)
+	Q_PROPERTY(qint16 saturation READ getTemperature WRITE setSaturation )
 
 
 private:
@@ -39,13 +40,20 @@ private:
 
 public:
     explicit LIFXLightClient(QObject *parent = 0);
-    LIFXLightClient( LIFXPacket *packet );
+	LIFXLightClient( LIFXPacket *packet, QObject *parent = 0 );
 
     bool setState(LIFXPacket *packet);
     //LIFX-specific set/get functions
     QString setLabel(QString newLabel);
     QString setLabel_NoUpdate(QString newLabel){ label = newLabel; return label;};
-    QString getLabel(){return label;};
+	QString getLabel()
+	{
+		if(label.isEmpty())
+		{
+			return QString();
+		}
+		return label;
+	};
 
     //Overloaded or required by parent classes
     //1. IoT-PowerSwitch
@@ -54,10 +62,11 @@ public:
     //2. IoT-Lightbulb
     void setColour(int red, int green, int blue);
     Q_INVOKABLE void setColour(QColor color);
-    Q_INVOKABLE void setBrightness(float brightnesspercent);
+	Q_INVOKABLE void setBrightness(float brightnesspercent);
     Q_INVOKABLE void setTemperature(int kelvin);
-    Q_INVOKABLE void setColourAll(int red, int green, int blue, float brightnesspercent, int kelvin);
+    Q_INVOKABLE void setColourAll(int red, int green, int blue, float brightnesspercent, int saturation, int kelvin);
     Q_INVOKABLE void setDimming(float dimpercent);
+    Q_INVOKABLE void setSaturation(float saturation);
 
     //3. IoT-Timer
     long setTime(long newTime);
@@ -67,13 +76,16 @@ public:
 
     //LIFXGatewayClient *gatewayclient;
 signals:
-    //From IoTLightbulbClient
-    void bulbRemoteChanged(IoTLightBulbClient *);
+    //1. From IoTPowerSwitchClient
+    void    powerChanged(bool state);
+
+    //2. From IoTLightbulbClient
+    void    bulbRemoteChanged(IoTLightBulbClient *);
     void    bulbColorsChanged();
-    //From IoTPowerSwitchClient
-    void powerChanged(bool state);
-    //From IoTTimerClient
-    void timeChanged(QDateTime newTime);
+
+    //3. From IoTTimerClient
+    void    timeChanged(QDateTime newTime);
+
 public slots:
 
 };

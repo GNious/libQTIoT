@@ -5,7 +5,7 @@
 #include "qtiotconstants.h"
 
 #include <QDateTime>
-#include <QTimeZone>
+//#include <QTimeZone>
 
 namespace QTIoT {
 
@@ -26,8 +26,8 @@ protected:
     qint64 timesec; //time since Epoch
     QDateTime time;
 
-signals:
-    void timeChanged(QDateTime newTime);
+/*signals:
+    void timeChanged(QDateTime newTime);*/
 
 };
 

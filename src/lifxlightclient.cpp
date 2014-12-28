@@ -1,13 +1,19 @@
+#include <iostream>
+
 #include "lifxlightclient.h"
 
 namespace QTIoT {
 namespace LIFX {
 
 LIFXLightClient::LIFXLightClient(QObject *parent) :
-    QTIoT::IoTLightBulbClient(parent)
+    QTIoT::IoTObject(parent),
+    QTIoT::IoTLightBulbClient(),
+    QTIoT::IoTPowerSwitchClient(),
+    QTIoT::IoTTimerClient()
 {
 }
-LIFXLightClient::LIFXLightClient(LIFXPacket *packet) :
+LIFXLightClient::LIFXLightClient(LIFXPacket *packet, QObject *parent) :
+    QTIoT::IoTObject(parent),
     QTIoT::IoTLightBulbClient(),
     QTIoT::IoTPowerSwitchClient(),
     QTIoT::IoTTimerClient()
@@ -22,7 +28,7 @@ LIFXLightClient::LIFXLightClient(LIFXPacket *packet) :
     setTemperature_NoUpdate(payload->kelvin);
     setBrightness_NoUpdate( payload->brightness / 655.35);
     setLabel_NoUpdate(payload->bulb_label);
-    fadetime = 100;
+	fadetime = 1;//100;
 
 }
 bool LIFXLightClient::setState(LIFXPacket *packet)
@@ -57,6 +63,8 @@ QString LIFXLightClient::setLabel(QString newLabel)
         memcpy( payload->label, newLabel.toUtf8().constData(), newLabel.length());
         ((LIFXGatewayClient*)gatewayclient)->SendPacket(packet);
     }
+	else
+        std::cout << "failed to create LIFXPacket(LIFX_SET_BULB_LABEL)" << std::endl;
 
     return setLabel_NoUpdate(newLabel);
 }
@@ -74,6 +82,8 @@ bool LIFXLightClient::setPower(bool state)
         payload->state = (LIFXPowerOnOff_t)state;
         ((LIFXGatewayClient*)gatewayclient)->SendPacket(packet);
     }
+	else
+        std::cout << "failed to create LIFXPacket(LIFX_SET_POWER_STATE)" << std::endl;
 
     QTIoT::IoTPowerSwitchClient::setPower_NoUpdate(state);
     return state;
@@ -93,7 +103,7 @@ void LIFXLightClient::setColour(QColor color)
 }
 void LIFXLightClient::setBrightness(float brightnesspercent)
 {
-    LIFXPacket *packet = new LIFXPacket(LIFX_SET_DIM_ABSOLUTE);
+/*    LIFXPacket *packet = new LIFXPacket(LIFX_SET_DIM_ABSOLUTE);
     memcpy(packet->header.target_mac_address, m_addressraw, sizeof(packet->header.target_mac_address));
     LIFXSetDimAbsStatePayload *payload = (LIFXSetDimAbsStatePayload*)packet->payloaddata;
     if(payload != NULL)
@@ -103,17 +113,27 @@ void LIFXLightClient::setBrightness(float brightnesspercent)
 
         ((LIFXGatewayClient*)gatewayclient)->SendPacket(packet);
     }
-    QTIoT::IoTLightBulbClient::setBrightness_NoUpdate(brightnesspercent);
-    //sendColour();
+	else
+        std::cout << "failed to create LIFXPacket(LIFX_SET_DIM_RELATIVE)" << std::endl;*/
+
+	QTIoT::IoTLightBulbClient::setBrightness_NoUpdate(brightnesspercent);
+	sendColour();
+}
+void LIFXLightClient::setSaturation(float saturation)
+{
+    QTIoT::IoTLightBulbClient::setSaturation(saturation);
+    sendColour();
 }
 void LIFXLightClient::setTemperature(int kelvin)
 {
-    QTIoT::IoTLightBulbClient::setTemperature_NoUpdate(kelvin);
-    sendColour();
+	//QTIoT::IoTLightBulbClient::setTemperature_NoUpdate(kelvin);
+	setColourAll(red, green, blue, brightness, 0, kelvin);
+	//sendColour();
 }
-void LIFXLightClient::setColourAll(int red, int green, int blue, float brightnesspercent, int kelvin)
+void LIFXLightClient::setColourAll(int red, int green, int blue, float brightnesspercent, int saturation, int kelvin)
 {
-    QTIoT::IoTLightBulbClient::setColourAll_NoUpdate( red, green, blue, brightnesspercent, kelvin);
+    QTIoT::IoTLightBulbClient::setColourAll_NoUpdate( red, green, blue, brightnesspercent, saturation, kelvin);
+    sendColour();
 }
 void LIFXLightClient::setDimming(float dimpercent)
 {
@@ -127,6 +147,9 @@ void LIFXLightClient::setDimming(float dimpercent)
 
         ((LIFXGatewayClient*)gatewayclient)->SendPacket(packet);
     }
+	else
+        std::cout << "failed to create LIFXPacket(LIFX_SET_DIM_RELATIVE)" << std::endl;
+
     QTIoT::IoTLightBulbClient::setDimming(dimpercent);
 }
 bool LIFXLightClient::sendColour()
@@ -136,19 +159,35 @@ bool LIFXLightClient::sendColour()
     LIFXSetLightColorPayload *payload = (LIFXSetLightColorPayload*)packet->payloaddata;
     if(payload != NULL)
     {
-        QColor color = QColor::fromRgb(red, green, blue);
+		//QColor color = QColor::fromRgb(red, green, blue);
         //color.getHsl( *payload->hue, *payload->saturation, *payload->brightness);
+		std::cout << "red " << red
+				  << "- green " << green
+				  << "- blue " << blue
+				  << "- hue " << m_color.hslHue()
+				  << "- sat " << this->saturation
+				  << "- bri " << brightness
+				  << "- kel " << kelvin
+				  << std::endl;
 
         payload->stream     = 0;
-        payload->hue        = color.hslHue() *275;
-        payload->saturation = color.hslSaturation()*257;
-        payload->brightness = color.lightness()*655.35;
+		payload->hue        = static_cast<int>(m_color.hslHueF() * 65535);// color.hsvHue() *275;
+		payload->saturation = static_cast<int>(saturation*256); // .hslSaturation()*257;
+		payload->brightness = static_cast<int>(brightness * 655.35);//.lightness()*655.35);
         payload->kelvin     = kelvin;
-        payload->fade_time  = fadetime;
+		payload->fade_time  = fadetime;
 
+/*		std::cout << "hue: " + (int)payload->hue <<
+					 " sat: "+ (int)payload->saturation <<
+					 " bri: "+ (int)payload->brightness <<
+					 " tmp: "+ (int)payload->kelvin <<
+					 " fad: "+ (int)payload->fade_time << std::endl;
+*/
         ((LIFXGatewayClient*)gatewayclient)->SendPacket(packet);
         return true;
     }
+    std::cout << "failed to create LIFXPacket(LIFX_SET_LIGHT_COLOR)" << std::endl;
+
 
     return false;
 }

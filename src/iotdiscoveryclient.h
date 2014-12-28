@@ -18,6 +18,7 @@ class QTIOTSHARED_EXPORT IoTDiscoveryClient : public QObject
 {
     Q_OBJECT
 
+
 public:
     explicit IoTDiscoveryClient(QObject *parent = 0);
 
@@ -28,11 +29,14 @@ public:
     virtual bool connectUDP() =0;
     virtual bool sendMessage(IoTObject *obj, void *msg) =0;
     virtual bool discover() =0;
+    Q_INVOKABLE virtual bool startDiscoveryTimer(int waitMs = 10000);// =0;
+    Q_INVOKABLE virtual bool endDiscoveryTimer();// =0;
 
     QMap<QString, QTIoT::IoTObject*> getIoTItems() { return items;};
     QMap<QString, QTIoT::IoTGatewayClient*> getGateways() { return gateways;};
 
 protected:
+    QTimer *discoveryTimer;
     bool addGatewayClient(QString address, QTIoT::IoTGatewayClient *client);
     bool addIoTItem(QString address, QTIoT::IoTObject *item);
 
@@ -44,6 +48,8 @@ public slots:
 
 protected slots:
     void IoTItemDiscovered(IoTObject * item);
+    void timingDiscovery();
+
 
 };
 

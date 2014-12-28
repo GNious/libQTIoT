@@ -55,18 +55,18 @@ enum LIFXNetworkSecurityProtocol_t //: byte
 typedef struct LIFXPANGatewayPayload
 {
     LIFXNetworkService_t service;
-    uint32_t port;
+	quint32 port;
 } LIFXPANGatewayPayload;
 typedef struct LIFXLightStatusPayload
 {
-    uint16_t hue;          // LE
-    uint16_t saturation;   // LE
-    uint16_t brightness;   // LE
-    uint16_t kelvin;       // LE
-    uint16_t dim;          // LE?
-    uint16_t power;
+	quint16 hue;          // LE
+	quint16 saturation;   // LE
+	quint16 brightness;   // LE
+	quint16 kelvin;       // LE
+	quint16 dim;          // LE?
+	quint16 power;
     char bulb_label[32]; // UTF-8 encoded string
-    uint64_t tags;
+	quint64 tags;
 } LIFXLightStatusPayload;
 typedef struct LIFXSetPowerStatePayload
 {
@@ -79,29 +79,29 @@ typedef struct LIFXPowerStatePayload
 typedef struct LIFXSetLightColorPayload
 {
     char        stream;     // Unknown, potential "streaming" mode toggle? Set to 0x00 for now.
-    uint16_t    hue;        // LE NOTE: Wraps around at 0xff 0xff back to 0x00 0x00, which is a primary red colour
-    uint16_t    saturation; // LE
-    uint16_t    brightness; // LE
-    uint16_t    kelvin;     // LE i.e. colour temperature (whites wheel in apps)
-    uint32_t    fade_time;  // LE Length of fade action, in seconds
+	quint16    hue;        // LE NOTE: Wraps around at 0xff 0xff back to 0x00 0x00, which is a primary red colour
+	quint16    saturation; // LE
+	quint16    brightness; // LE
+	quint16    kelvin;     // LE i.e. colour temperature (whites wheel in apps)
+	quint32    fade_time;  // LE Length of fade action, in seconds
 } LIFXSetLightColorPayload;
 typedef struct LIFXSetTimeStatePayload
 {
-    uint64_t    time;
+	quint64    time;
 } LIFXSetTimeStatePayload;
 typedef struct LIFXTimeStatePayload
 {
-    uint64_t    time;
+	quint64    time;
 } LIFXTimeStatePayload;
 typedef struct LIFXSetDimAbsStatePayload
 {
-    int16_t     brightness;
-    uint32_t    fade_time;  // LE Length of fade action, in seconds
+	qint16     brightness;
+	quint32    fade_time;  // LE Length of fade action, in seconds
 } LIFXSetDimAbsStatePayload;
 typedef struct LIFXSetDimRelStatePayload
 {
-    int16_t     brightness;
-    uint32_t    fade_time;  // LE Length of fade action, in seconds
+	qint16     brightness;
+	quint32    fade_time;  // LE Length of fade action, in seconds
 } LIFXSetDimRelStatePayload;
 typedef struct LIFXSetBulbLabelPayload
 {
@@ -115,39 +115,39 @@ typedef struct LIFXBulbLabelPayload
 
 typedef struct LIFXSetTagsPayload
 {
-    uint64_t    tags;
+	quint64    tags;
 } LIFXSetTagsPayload;
 typedef struct LIFXTagsPayload
 {
-    uint64_t    tags;
+	quint64    tags;
 } LIFXTagsPayload;
 typedef struct LIFXGetTagLabelsPayload
 {
-    uint64_t    tags;
+	quint64    tags;
 } LIFXGetTagLabelsPayload;
 typedef struct LIFXSetTagLabelsPayload
 {
-    uint64_t    tags;
+	quint64    tags;
     char        label[32]; // UTF-8 encoded string
 } LIFXSetTagLabelsPayload;
 typedef struct LIFXTagLabelPayload
 {
-    uint64_t    tags;
+	quint64    tags;
     char        label[32]; // UTF-8 encoded string
 } LIFXTagLabelPayload;
 
 
 typedef struct LIFXVersionStatePayload
 {
-    uint32_t    vendor;
-    uint32_t    product;
-    uint32_t    version;
+	quint32    vendor;
+	quint32    product;
+	quint32    version;
 } LIFXVersionStatePayload;
 typedef struct LIFXInfoStatePayload
 {
-    uint64_t    time;      // LE
-    uint64_t    uptime;    // LE
-    uint64_t    downtime;  // LE
+	quint64    time;      // LE
+	quint64    uptime;    // LE
+	quint64    downtime;  // LE
 } LIFXInfoStatePayload;
 
 
@@ -173,8 +173,8 @@ typedef struct LIFXAccessPointPayload  //No Yet Modelled!!
     LIFXNetworkWifiType_t interface;  // Byte
     char ssid[32];                    // UTF-8 encoded string
     LIFXNetworkSecurityProtocol_t security_protocol; // Byte
-    uint16_t strength;
-    uint16_t channel;
+	quint16 strength;
+	quint16 channel;
 } LIFXAccessPointPayload;
 #pragma pack(pop)
 
